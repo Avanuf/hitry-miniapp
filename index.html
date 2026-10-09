@@ -90,10 +90,23 @@
 
     function pad(n) { return (n < 10 ? "0" : "") + n; }
 
-    document.getElementById("date").value = (function () {
-      var t = new Date(); t.setDate(t.getDate() + 1);
-      return t.getFullYear() + "-" + pad(t.getMonth() + 1) + "-" + pad(t.getDate());
+    // Предзаполнение из параметров, которые бот кладёт в URL WebApp-кнопки:
+    // ?origin=MOW&destination=SYX&date=2026-10-16
+    (function prefill() {
+      var q = new URLSearchParams(window.location.search);
+      var o = (q.get("origin") || "").toUpperCase();
+      var d = (q.get("destination") || "").toUpperCase();
+      var dt = q.get("date") || "";
+      if (/^[A-Z]{3}$/.test(o)) document.getElementById("origin").value = o;
+      if (/^[A-Z]{3}$/.test(d)) document.getElementById("destination").value = d;
+      if (/^\d{4}-\d{2}-\d{2}$/.test(dt)) document.getElementById("date").value = dt;
     })();
+
+    document.getElementById("date").value = document.getElementById("date").value ||
+      (function () {
+        var t = new Date(); t.setDate(t.getDate() + 1);
+        return t.getFullYear() + "-" + pad(t.getMonth() + 1) + "-" + pad(t.getDate());
+      })();
 
     document.getElementById("go").addEventListener("click", function () {
       var o = document.getElementById("origin").value.trim().toUpperCase();
